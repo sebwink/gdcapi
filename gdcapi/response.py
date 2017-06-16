@@ -1,0 +1,2 @@
+class GdcApiResponse(object):
+    pass
