@@ -203,3 +203,5 @@ class GdcApiQueryFilter(object):
         else:
             _lb = field >= lb
         self &= ( _lb & _ub )
+
+    # TODO: implement negation

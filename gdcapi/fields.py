@@ -14,7 +14,7 @@ def get_filter(operator):
 
 
 class GdcApiField(object):
-    def __init__(self, mapping):
+    def __init__(self, mapping, endpoint):
         self._description = mapping.get('description', None)
         if self._description:
             self._description = self._description.strip()
@@ -22,6 +22,7 @@ class GdcApiField(object):
         self._field = mapping.get('field', None)
         self._full = mapping.get('full', None)
         self._type = mapping.get('type', None)
+        self._endpoint = endpoint
 
     @property
     def name(self):
@@ -107,3 +108,20 @@ class GdcApiField(object):
                                'value' : [str(e) for e in other]
                              }
                }
+
+    def values(self, query={}):
+        return list(self.value_histogram(query).keys())
+
+    def value_histogram(self, query={}):
+        if isinstance(query, gdcapi.query.GdcApiQueryFilter):
+            query &= query
+        if isinstance(query, gdcapi.query.GdcApiQuery):
+            query.filters &= query.filters
+        if isinstance(query, dict) and 'filters' in query:
+            query['filters'] = {
+                                 'op' : 'and',
+                                 'values' : [ query['filters'], query['filters'] ]
+                               }
+        response = self._endpoint.query(query, size=0, facets=[self])
+        return response.histograms[self.name]
+

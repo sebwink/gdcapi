@@ -1,12 +1,15 @@
-from gdcapi.endpoint.base import GdcEndpoint
+from gdcapi.endpoint.base import GdcEndpoint, DEFAULT_API_ROOT
 
 class StatusBase(GdcEndpoint):
     def __init__(self, api_root, **kwargs):
         super().__init__(api_root, 'status')
 
-class Status(StatusBase):
-    def __init__(self, api_root):
+class Status(StatusBase): 
+    def __init__(self, api_root = DEFAULT_API_ROOT):
         super().__init__(api_root)
+
+    def __call__(self):
+        return self.query()
 
     def _key(self, key):
         status = self.query()
